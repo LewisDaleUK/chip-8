@@ -1,10 +1,12 @@
+#include "toolbox.h"
+
 #ifndef FONT_H
     #define FONT_H
 
     #define FONT_SIZE 80
     #define FONT_IDX 0x050
 
-    const unsigned char FONT [] = {
+    const static u8 FONT [FONT_SIZE] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
         0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -23,4 +25,6 @@
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
     
+
+    void init_font(u8 memory[]);
 #endif
