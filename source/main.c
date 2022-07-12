@@ -6,7 +6,42 @@
 
 #include "toolbox.h"
 #include "screen.h"
+#include "keymap.h"
 #include "chip8.h"
+
+u8 map_key(SDL_KeyCode keycode) {
+    for (int i = 0; i < KEYBOARD_SIZE; i++) {
+        if (KEYMAP[i] == keycode) {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+void handle_events(Chip8 *chip8) {
+    SDL_Event e;
+    u8 key;
+    
+    while( SDL_PollEvent(&e) ) {
+        switch(e.type) {
+            case SDL_KEYDOWN:
+                key = map_key(e.key.keysym.sym);
+
+                if (key) {
+                    chip8->key_pressed = &chip8->keyboard[key];
+                }
+
+                break;
+            case SDL_KEYUP:
+                chip8->key_pressed = NULL;
+                break;
+            case SDL_QUIT:
+                chip8->is_running = FALSE;
+                break;
+        }
+    }
+}
 
 int main(int argc, char *argv[]) {
     Chip8 chip8 = chip8_init();
@@ -53,14 +88,7 @@ int main(int argc, char *argv[]) {
             SDL_UpdateWindowSurface(window);
         }
                 
-        while(SDL_PollEvent(&e) > 0 ) {
-            switch(e.type)
-            {
-                case SDL_QUIT:
-                    chip8.is_running = FALSE;
-                    break;
-            }
-        }
+        handle_events(&chip8);
         usleep(SECOND_DELAY);   
     }
    

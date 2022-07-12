@@ -7,6 +7,7 @@
 #define CHIP8_STACK_SIZE 16
 #define TIMER_INITIAL_VALUE 60
 #define V_REG_SIZE 16
+#define KEYBOARD_SIZE 16
 
 #define PROGRAM_START_ADDR 0x200
 #define MAX_PROGRAM_LEN 3583
@@ -25,6 +26,9 @@ typedef struct Chip8_S {
 
     u8 delay_timer;
     u8 sound_timer;
+
+    u8 keyboard[KEYBOARD_SIZE];
+    u8 *key_pressed;
 
     u8 updated_flag;
     u8 is_running;

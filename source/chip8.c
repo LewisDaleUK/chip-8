@@ -19,7 +19,8 @@ Chip8 chip8_init() {
         .memory = {0},
         .is_running = TRUE,
         .stack = {0},
-        .pc = PROGRAM_START_ADDR
+        .pc = PROGRAM_START_ADDR,
+        .key_pressed = NULL
     };
 
     memcpy(&chip8.memory[FONT_IDX], &FONT, FONT_SIZE);
