@@ -263,9 +263,14 @@ void shift_left(Chip8 *cpu) {
     }
 }
 
-void decode(Chip8 *cpu) {
-    // Decode the fetched instruction
+void jump_offset(Chip8 *cpu) {
+    u8 offset = cpu->v_reg[0x0];
+    u16 address = cpu->instruction & 0x0FFF;
 
+    cpu->pc = address + offset;
+}
+
+void decode(Chip8 *cpu) {
     if (!cpu->instruction) {
         exit(EXIT_FAILURE);
     }
@@ -356,6 +361,7 @@ void decode(Chip8 *cpu) {
             break;
 
         case 0xB000:
+            jump_offset(cpu);
             break;
 
         case 0xC000:

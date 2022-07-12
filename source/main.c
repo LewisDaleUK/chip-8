@@ -8,8 +8,6 @@
 #include "screen.h"
 #include "chip8.h"
 
-#include "sprite.h"
-
 int main(int argc, char *argv[]) {
     Chip8 chip8 = chip8_init();
 
@@ -36,12 +34,6 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
 
     clear_display(renderer);
-
-    for (int i = 0; i < SPRITE_Y; i++) {
-        memcpy(&(chip8.display[i]), &SPRITE[i], SPRITE_X * sizeof(u8));
-    }
-
-    chip8.updated_flag = TRUE;
 
     while(chip8.is_running) {
         cycle_count++;
