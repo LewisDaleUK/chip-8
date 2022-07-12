@@ -40,16 +40,16 @@ int main() {
 
     clear_display(renderer);
 
-    for (int i = 0; i < SPRITE_X; i++) {
-        memcpy(&(chip8.display[i]), &SPRITE[i], SPRITE_Y * sizeof(u8));
+    for (int i = 0; i < SPRITE_Y; i++) {
+        memcpy(&(chip8.display[i]), &SPRITE[i], SPRITE_X * sizeof(u8));
     }
 
     int br_loop = 0;
     while(br_loop == 0) {
         while(SDL_PollEvent(&e) > 0 ) {
+                draw_display(renderer, texture, chip8.display);
+
                 // Do stuff
-                draw_display(renderer, chip8.display);
-                SDL_RenderPresent(renderer);
                 SDL_UpdateWindowSurface(window);
 
                 switch(e.type)

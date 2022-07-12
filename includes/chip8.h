@@ -7,7 +7,7 @@
 #define CHIP8_STACK_SIZE 16
 
 typedef struct Chip8_S {
-    u8 display[SCREEN_X][SCREEN_Y];
+    u8 display[SCREEN_Y][SCREEN_X];
     u8 memory[4096];
     u16 stack[CHIP8_STACK_SIZE];
 

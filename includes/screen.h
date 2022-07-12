@@ -11,11 +11,10 @@
     #define COL_BLACK 0,0,0
     #define COL_WHITE 255,255,255
 
-    typedef u8 Display[SCREEN_X][SCREEN_Y];
+    typedef u8 Display[SCREEN_Y][SCREEN_X];
 
-    extern Display DISPLAY;
-
+    void buffer_display(Display display);
     void clear_display(SDL_Renderer *renderer);
-    void draw_display(SDL_Renderer *renderer, Display display);
+    void draw_display(SDL_Renderer *renderer, SDL_Texture *texture, Display display);
 
 #endif
