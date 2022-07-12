@@ -130,6 +130,139 @@ void draw(Chip8 *cpu) {
     cpu->updated_flag = TRUE;
 }
 
+void skip_x_nn_eq(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 nn = cpu->instruction & 0x00FF;
+
+    if (cpu->v_reg[x] == nn) {
+        cpu->pc += 2;
+    }
+}
+
+void skip_x_nn_neq(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 nn = cpu->instruction & 0x00FF;
+
+    if (cpu->v_reg[x] != nn) {
+        cpu->pc += 2;
+    }
+}
+
+void skip_x_y_eq(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    if (cpu->v_reg[x] == cpu->v_reg[y]) {
+        cpu->pc += 2;
+    }
+}
+
+void skip_x_y_neq(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    if (cpu->v_reg[x] != cpu->v_reg[y]) {
+        cpu->pc += 2;
+    }
+}
+
+void set_vx_vy(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    cpu->v_reg[x] = cpu->v_reg[y];
+}
+
+void set_vx_or_vy(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    cpu->v_reg[x] |= cpu->v_reg[y];
+}
+
+void set_vx_and_vy(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    cpu->v_reg[x] &= cpu->v_reg[y];
+}
+
+void set_vx_xor_vy(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    cpu->v_reg[x] ^= cpu->v_reg[y];
+}
+
+void set_vx_add_vy(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    cpu->v_reg[x] += cpu->v_reg[y];
+}
+
+void sub_vx_vy(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    cpu->v_reg[0xF] = TRUE;
+
+    if (cpu->v_reg[x] <= cpu->v_reg[y]) {
+        cpu->v_reg[0xF] = FALSE;
+    }
+
+    cpu->v_reg[x] -= cpu->v_reg[y];
+}
+
+void sub_vy_vx(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+
+    cpu->v_reg[0xF] = TRUE;
+
+    if (cpu->v_reg[y] <= cpu->v_reg[x]) {
+        cpu->v_reg[0xF] = FALSE;
+    }
+
+    cpu->v_reg[y] -= cpu->v_reg[x];
+}
+
+void shift_right(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+    
+    cpu->v_reg[x] = cpu->v_reg[y];
+
+    u8 vx = cpu->v_reg[x];
+    cpu->v_reg[x] = vx >> 1;
+
+    printf("vx: 0x%x\n", vx);
+    printf("vx >> 1: 0x%x\n", vx >> 1);
+    printf("vx & 0x01: 0x%x\n", vx & 0x01);
+
+    printf("v_reg[x]: 0x%x\n", cpu->v_reg[x]);
+
+    cpu->v_reg[0xF] = TRUE;
+    if (!((vx & 0x01))) {
+        cpu->v_reg[0xF] = 0;
+    }
+}
+
+void shift_left(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 y = (cpu->instruction & 0x00F0) >> 4;
+    
+    cpu->v_reg[x] = cpu->v_reg[y];
+
+    u8 vx = cpu->v_reg[x];
+    cpu->v_reg[x] = vx << 1;
+
+    cpu->v_reg[0xF] = TRUE;
+    if (!((vx & 0x10) >> 8)) {
+        cpu->v_reg[0xF] = 0;
+    }
+}
+
 void decode(Chip8 *cpu) {
     // Decode the fetched instruction
 
@@ -162,6 +295,18 @@ void decode(Chip8 *cpu) {
             cpu->pc = cpu->instruction & 0x0FFF;
             break;
 
+        case 0x3000:
+            skip_x_nn_eq(cpu);
+            break;
+
+        case 0x4000:
+            skip_x_nn_neq(cpu);
+            break;
+
+        case 0x5000:
+            skip_x_y_eq(cpu);
+            break;
+
         case 0x6000:
             set_vx_nn(cpu);
             break;
@@ -170,12 +315,60 @@ void decode(Chip8 *cpu) {
             add_vx_nn(cpu);
             break;
 
+        case 0x8000:
+            switch (cpu->instruction & 0x000F) {
+                case 0x0000:
+                    set_vx_vy(cpu);
+                    break;
+                case 0x0001:
+                    set_vx_or_vy(cpu);
+                    break;
+                case 0x0002:
+                    set_vx_and_vy(cpu);
+                    break;
+                case 0x0003:
+                    set_vx_xor_vy(cpu);
+                    break;
+                case 0x0004:
+                    set_vx_add_vy(cpu);
+                    break;
+                case 0x0005:
+                    sub_vx_vy(cpu);
+                    break;
+                case 0x0006:
+                    shift_right(cpu);
+                    break;
+                case 0x0007:
+                    sub_vy_vx(cpu);
+                    break;
+                case 0x000E:
+                    shift_left(cpu);
+                    break;
+            }
+            break;
+        
+        case 0x9000:
+            skip_x_y_neq(cpu);
+            break;
+
         case 0xA000:
             set_index_register(cpu);
             break;
 
+        case 0xB000:
+            break;
+
+        case 0xC000:
+            break;
+
         case 0xD000:
             draw(cpu);
+            break;
+
+        case 0xE000:
+            break;
+
+        case 0xF000:
             break;
     }
 }
