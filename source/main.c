@@ -10,8 +10,10 @@
 
 #include "sprite.h"
 
-int main() {
+int main(int argc, char *argv[]) {
     Chip8 chip8 = chip8_init();
+
+    load_rom(&chip8, argv[1]);
 
     int cycle_count = 0;
 
@@ -43,6 +45,8 @@ int main() {
 
     while(chip8.is_running) {
         cycle_count++;
+
+        execute(&chip8);
 
         if (cycle_count == TIMER_INTERVAL) {
             cycle_count = 0;

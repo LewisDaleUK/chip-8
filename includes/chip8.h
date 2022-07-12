@@ -8,11 +8,15 @@
 #define TIMER_INITIAL_VALUE 60
 #define V_REG_SIZE 16
 
+#define PROGRAM_START_ADDR 0x200
+#define MAX_PROGRAM_LEN 3583
+
 typedef struct Chip8_S {
     u8 display[SCREEN_Y][SCREEN_X];
     u8 memory[4096];
 
     u16 pc;
+    u16 instruction;
     u16 i;
     u16 stack[CHIP8_STACK_SIZE];
 
@@ -27,7 +31,12 @@ typedef struct Chip8_S {
 } Chip8;
 
 Chip8 chip8_init();
+
+void load_rom(Chip8 *cpu, char *fn);
 void update_timers(Chip8 *cpu);
-void handle_instruction(Chip8 *cpu);
+
+void execute(Chip8 *cpu);
+void fetch(Chip8 *cpu);
+void decode(Chip8 *cpu);
 
 #endif
