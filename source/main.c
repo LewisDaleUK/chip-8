@@ -1,24 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <SDL2/SDL.h>
 
-#include "font.h"
 #include "toolbox.h"
 #include "screen.h"
 #include "chip8.h"
 
 #include "sprite.h"
 
-void init_font(u8 memory[]) {
-    memcpy(&memory[FONT_IDX], &FONT, FONT_SIZE);
-}
-
-
 int main() {
     Chip8 chip8 = chip8_init();
 
-    init_font(chip8.memory);
+    int cycle_count = 0;
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = SDL_CreateWindow("Chip-8 Emulator",
@@ -44,22 +39,33 @@ int main() {
         memcpy(&(chip8.display[i]), &SPRITE[i], SPRITE_X * sizeof(u8));
     }
 
-    int br_loop = 0;
-    while(br_loop == 0) {
+    chip8.updated_flag = TRUE;
+
+    while(chip8.is_running) {
+        cycle_count++;
+
+        if (cycle_count == TIMER_INTERVAL) {
+            cycle_count = 0;
+
+            update_timers(&chip8);
+        }
+
+        if (chip8.updated_flag) {
+            chip8.updated_flag = FALSE;
+
+            draw_display(renderer, texture, chip8.display);
+            SDL_UpdateWindowSurface(window);
+        }
+                
         while(SDL_PollEvent(&e) > 0 ) {
-                draw_display(renderer, texture, chip8.display);
-
-                // Do stuff
-                SDL_UpdateWindowSurface(window);
-
-                switch(e.type)
-                {
-                    case SDL_QUIT:
-                        br_loop = 1;
-                        break;
-                }
-
+            switch(e.type)
+            {
+                case SDL_QUIT:
+                    chip8.is_running = FALSE;
+                    break;
             }
+        }
+        usleep(SECOND_DELAY);   
     }
    
     return 0;
