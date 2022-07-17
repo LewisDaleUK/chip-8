@@ -1,7 +1,7 @@
 #ifndef TOOLBOX_H
     #define TOOLBOX_H
 
-    #define SECOND_DELAY 1851 // Delay 1851us to achieve roughly 540Hz
+    #define SECOND_DELAY 900 // Delay 1851us to achieve roughly 540Hz
     #define TIMER_INTERVAL 9 // Max timer count to keep our delay timers at 60Hz
 
     #define TRUE 1
