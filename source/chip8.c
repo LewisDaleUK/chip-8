@@ -20,7 +20,7 @@ Chip8 chip8_init() {
         .is_running = TRUE,
         .stack = {0},
         .pc = PROGRAM_START_ADDR,
-        .key_pressed = NULL
+        .key_pressed = NO_KEY
     };
 
     memcpy(&chip8.memory[FONT_IDX], &FONT, FONT_SIZE);
@@ -173,9 +173,55 @@ void decode(Chip8 *cpu) {
             break;
 
         case 0xE000:
+            switch (cpu->instruction & 0x00FF) {
+                case 0x009E:
+                    skip_if_key(cpu);
+                    break;
+                case 0x00A1:
+                    skip_if_not_key(cpu);
+                    break;
+            }
             break;
 
         case 0xF000:
+            switch (cpu->instruction & 0x00FF) {
+                case 0x0007:
+                    // timers
+                    set_vx_delay(cpu);
+                    break;
+                case 0x0015:
+                    // timers
+                    set_delay_vx(cpu);
+                    break;
+                case 0x0018:
+                    set_sound_vx(cpu);
+                    // timers
+                    break;
+                case 0x001E:
+                    add_to_index(cpu);
+                    break;
+                case 0x000A:
+                    // get key
+                    get_key(cpu);
+                    break;
+                case 0x0029:
+                    // Font character
+                    font_char(cpu);
+                    break;
+                case 0x0033:
+                    // Binary coded decimal conversion
+                    binary_decimal_conversion(cpu);
+                    break;
+                case 0x0055:
+                    // Store memory
+                    printf("Storing memory\n");
+                    store_memory(cpu);
+                    break;
+                case 0x0065:
+                    // Load memory
+                    load_memory(cpu);
+                    break;
+            }
             break;
     }
 }

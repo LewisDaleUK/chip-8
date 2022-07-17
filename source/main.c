@@ -16,7 +16,7 @@ u8 map_key(SDL_KeyCode keycode) {
         }
     }
 
-    return 0;
+    return NO_KEY;
 }
 
 void handle_events(Chip8 *chip8) {
@@ -26,15 +26,10 @@ void handle_events(Chip8 *chip8) {
     while( SDL_PollEvent(&e) ) {
         switch(e.type) {
             case SDL_KEYDOWN:
-                key = map_key(e.key.keysym.sym);
-
-                if (key) {
-                    chip8->key_pressed = &chip8->keyboard[key];
-                }
-
+                chip8->key_pressed = map_key(e.key.keysym.sym);
                 break;
             case SDL_KEYUP:
-                chip8->key_pressed = NULL;
+                chip8->key_pressed = NO_KEY;
                 break;
             case SDL_QUIT:
                 chip8->is_running = FALSE;

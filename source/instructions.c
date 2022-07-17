@@ -1,5 +1,6 @@
 #include "toolbox.h"
 #include "chip8.h"
+#include "instructions.h"
 
 void return_from_subroutine(Chip8 *cpu) {
     u16 addr = cpu->stack[cpu->stack_reg];
@@ -211,4 +212,84 @@ void rand_vx_nn(Chip8 *cpu) {
 
     u16 rint = rand();
     cpu->v_reg[x] = rint & nn;
+}
+
+void skip_if_key(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 key = cpu->v_reg[x];
+
+    if (cpu->key_pressed == key) {
+        cpu->pc += 2;
+    }
+}
+
+void skip_if_not_key(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    u8 key = cpu->v_reg[x];
+
+    if(cpu->key_pressed != key) {
+        cpu->pc += 2;
+    }
+}
+
+void set_vx_delay(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    cpu->v_reg[x] = cpu->delay_timer;
+}
+
+void set_delay_vx(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    cpu->delay_timer = cpu->v_reg[x];
+}
+
+void set_sound_vx(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    cpu->sound_timer = cpu->v_reg[x]; 
+}
+
+void add_to_index(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+    cpu->i += cpu->v_reg[x];
+}
+
+void get_key(Chip8 *cpu) {
+    if (cpu->key_pressed != NO_KEY) {
+        u8 x = (cpu->instruction & 0x0F00) >> 8;
+        cpu->v_reg[x] = cpu->key_pressed;
+    } else {
+        cpu->pc -= 2;
+    }
+}
+
+void font_char(Chip8 *cpu) {
+    u8 x = X_VAL;
+    u8 vx = cpu->v_reg[x];
+
+    // Multiply vx by 5 because the font sprites are 4*5 bytes
+    cpu->i = vx * 0x5;
+}
+
+void binary_decimal_conversion(Chip8 *cpu) {
+    u8 x = X_VAL;
+    u8 vx = cpu->v_reg[x];
+
+    cpu->memory[cpu->i] = vx / 100;
+    cpu->memory[cpu->i + 1] = (vx / 10) % 10;
+    cpu->memory[cpu->i + 2] = vx % 10;
+}
+
+void store_memory(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+
+    for(int i = 0x0; i <= x; i++) {
+        cpu->memory[cpu->i + i] = cpu->v_reg[i];
+    }
+}
+
+void load_memory(Chip8 *cpu) {
+    u8 x = (cpu->instruction & 0x0F00) >> 8;
+
+    for(int i = 0x0; i <= x; i++) {
+        cpu->v_reg[i] = cpu->memory[cpu->i + i];
+    }
 }
