@@ -172,12 +172,6 @@ void shift_right(Chip8 *cpu) {
     u8 vx = cpu->v_reg[x];
     cpu->v_reg[x] = vx >> 1;
 
-    printf("vx: 0x%x\n", vx);
-    printf("vx >> 1: 0x%x\n", vx >> 1);
-    printf("vx & 0x01: 0x%x\n", vx & 0x01);
-
-    printf("v_reg[x]: 0x%x\n", cpu->v_reg[x]);
-
     cpu->v_reg[0xF] = TRUE;
     if (!((vx & 0x01))) {
         cpu->v_reg[0xF] = 0;

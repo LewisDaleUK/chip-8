@@ -38,7 +38,6 @@ void load_rom(Chip8 *cpu, char *fn) {
         rom_length = ftell(file);
         rewind(file);
 
-        printf("File is %ld items long\n", rom_length);
         fread(&cpu->memory[PROGRAM_START_ADDR], sizeof(u8), rom_length, file);
     }
 
@@ -75,8 +74,6 @@ void decode(Chip8 *cpu) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Instruction: 0x%x\n", cpu->instruction);
-    
     switch(cpu->instruction & 0xF000) {
         case 0x0000:
             switch(cpu->instruction & 0x00FF) {
@@ -222,7 +219,6 @@ void decode(Chip8 *cpu) {
                     break;
                 case 0x0055:
                     // Store memory
-                    printf("Storing memory\n");
                     store_memory(cpu);
                     break;
                 case 0x0065:
