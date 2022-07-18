@@ -75,6 +75,8 @@ void decode(Chip8 *cpu) {
         exit(EXIT_FAILURE);
     }
 
+    printf("Instruction: 0x%x\n", cpu->instruction);
+    
     switch(cpu->instruction & 0xF000) {
         case 0x0000:
             switch(cpu->instruction & 0x00FF) {
@@ -87,6 +89,8 @@ void decode(Chip8 *cpu) {
                 case 0x00EE:
                     return_from_subroutine(cpu);                 
                     break;
+                default:
+                    printf("Unrecognised opcode: 0x%x\n", cpu->instruction);
             }
             break;
 
@@ -149,6 +153,8 @@ void decode(Chip8 *cpu) {
                 case 0x000E:
                     shift_left(cpu);
                     break;
+                default:
+                    printf("Unrecognised opcode: 0x%x\n", cpu->instruction);
             }
             break;
         
@@ -180,6 +186,8 @@ void decode(Chip8 *cpu) {
                 case 0x00A1:
                     skip_if_not_key(cpu);
                     break;
+                default:
+                    printf("Unrecognised opcode: 0x%x\n", cpu->instruction);
             }
             break;
 
@@ -221,7 +229,11 @@ void decode(Chip8 *cpu) {
                     // Load memory
                     load_memory(cpu);
                     break;
+                default:
+                    printf("Unrecognised opcode: 0x%x\n", cpu->instruction);
             }
             break;
+        default:
+            printf("Unrecognised opcode: 0x%x\n", cpu->instruction);
     }
 }
